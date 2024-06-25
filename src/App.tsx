@@ -1,33 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useCallback,  useRef, useEffect} from 'react'
+
+import './App.scss'
 
 function App() {
-  const [count, setCount] = useState(0)
 
+const [length, setLength] = useState<number>(20)
+const [uppercase, setUppercase] = useState<boolean>(false)
+const copyPasteClipBoard= ()=>{
+  console.log(copyPasteClipBoard)
+}
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+     <div className='container'>
+      <h2>Password Genarator</h2>
+      <div className="form">
+      <textarea cols={30} rows={10} value=""  readOnly></textarea>
+      <button onClick={copyPasteClipBoard}>Copy</button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+      <div className="options">
+        <div className="inputs">
+          <input
+          type = "range"
+          value= ""
+          max={100}
+          min={3}
+          onChange={(e)=> setLength(parseInt(e.target.value))}  
+          />
+          <label htmlFor="range">{length}</label>       
+        </div>
+        <div className="inputs">
+          <input type="checkbox" name="uppercase" id="uppercase"/>
+          <label htmlFor="uppercase">Uppercase</label>
+          </div>        
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      </div> 
     </>
   )
 }
