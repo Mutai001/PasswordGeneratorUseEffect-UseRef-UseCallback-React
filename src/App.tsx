@@ -1,41 +1,82 @@
-import { useState, useCallback,  useRef, useEffect} from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import './App.scss';
 
-import './App.scss'
+const App: React.FC = () => {
+  const [passwordLength, setPasswordLength] = useState<number>(8);
+  const [includeNumbers, setIncludeNumbers] = useState<boolean>(true);
+  const [includeLetters, setIncludeLetters] = useState<boolean>(true);
+  const [hashedPassword, setHashedPassword] = useState<string>('');
+  const passwordRef = useRef<HTMLTextAreaElement>(null);
 
-function App() {
+  const generatePassword = useCallback(() => {
+    let charset = '';
+    if (includeLetters) charset += 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if (includeNumbers) charset += '0123456789';
+    if (charset === '') {
+      setHashedPassword('');
+      return;
+    }
+    let password = '';
+    for (let i = 0; i < passwordLength; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      password += charset[randomIndex];
+    }
+    // Simple hash alternative
+    const hashed = btoa(password); // Base64 encoding
+    setHashedPassword(hashed);
+  }, [passwordLength, includeNumbers, includeLetters]);
 
-const [length, setLength] = useState<number>(20)
-const [uppercase, setUppercase] = useState<boolean>(false)
-const copyPasteClipBoard= ()=>{
-  console.log(copyPasteClipBoard)
-}
+  useEffect(() => {
+    generatePassword();
+  }, [generatePassword]);
+
+  const copyToClipboard = () => {
+    if (passwordRef.current) {
+      passwordRef.current.select();
+      document.execCommand('copy');
+    }
+  };
+
   return (
-    <>
-     <div className='container'>
-      <h2>Password Genarator</h2>
-      <div className="form">
-      <textarea cols={30} rows={10} value=""  readOnly></textarea>
-      <button onClick={copyPasteClipBoard}>Copy</button>
-      </div>
-      <div className="options">
-        <div className="inputs">
+    <div className="app">
+      <div className="container">
+        <h1>Password Generator</h1>
+        <div className="controls">
+          <label htmlFor="password-length">
+            Password Length: <span>{passwordLength}</span>
+          </label>
           <input
-          type = "range"
-          value= ""
-          max={100}
-          min={3}
-          onChange={(e)=> setLength(parseInt(e.target.value))}  
+            id="password-length"
+            type="range"
+            min="8"
+            max="32"
+            value={passwordLength}
+            onChange={(e) => setPasswordLength(Number(e.target.value))}
           />
-          <label htmlFor="range">{length}</label>       
+          <label>
+            <input
+              type="checkbox"
+              checked={includeNumbers}
+              onChange={(e) => setIncludeNumbers(e.target.checked)}
+            />
+            Include Numbers
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={includeLetters}
+              onChange={(e) => setIncludeLetters(e.target.checked)}
+            />
+            Include Letters
+          </label>
         </div>
-        <div className="inputs">
-          <input type="checkbox" name="uppercase" id="uppercase"/>
-          <label htmlFor="uppercase">Uppercase</label>
-          </div>        
+        <div className="output">
+          <textarea ref={passwordRef} value={hashedPassword} readOnly />
+          <button onClick={copyToClipboard}>Copy to Clipboard</button>
+        </div>
       </div>
-      </div> 
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
